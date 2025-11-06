@@ -135,54 +135,96 @@ createdb -U postgres shoe_store_management
 # (Thường là 'postgres' hoặc bạn đã đặt lúc cài)
 ```
 
-#### 1.3. Import Schema
+#### 1.3. Import Schema và Dữ liệu
+
+**⭐ QUAN TRỌNG:** Đồ án đã dồn tất cả SQL vào **1 file duy nhất**: `sql/setup_database.sql`
+
+**CÁCH 1: Sử dụng Command Line (Khuyên dùng - Nhanh nhất)**
 
 ```powershell
-# Import schema và dữ liệu mẫu
-& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d shoe_store_management -f sql/init_schema.sql
+# Windows PowerShell (Cách đầy đủ):
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d shoe_store_management -f sql/setup_database.sql
 
-# Thêm các columns cho online ordering
-& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d shoe_store_management -f sql/add_missing_columns.sql
+# Hoặc nếu psql đã có trong PATH:
+psql -U postgres -d shoe_store_management -f sql/setup_database.sql
 ```
 
-**Kết quả mong đợi:**
-```
-CREATE TABLE
-CREATE TABLE
-...
-INSERT 0 2
-INSERT 0 3
-...
-```
+**CÁCH 2: Sử dụng pgAdmin (GUI - Dễ hơn cho người mới)**
+
+1. Mở **pgAdmin 4**
+2. Trong cây thư mục bên trái:
+   - Mở `Servers` → `PostgreSQL 18` (nhập password nếu cần)
+   - Mở `Databases` → tìm `shoe_store_management`
+3. Click chuột phải vào `shoe_store_management` → chọn **"Query Tool"**
+4. Trong Query Tool:
+   - Click menu **File** → **Open File**
+   - Chọn file `d:\PTTK_Backup_Desktop\sql\setup_database.sql`
+   - File sẽ được load vào editor
+5. Click nút **Execute/Run** (biểu tượng ▶️) hoặc nhấn **F5**
+6. Đợi 2-3 giây để script chạy xong
+
+**CÁCH 3: Copy-Paste (Backup option)**
+
+1. Mở file `sql/setup_database.sql` bằng Notepad++/VSCode
+2. Copy toàn bộ nội dung (Ctrl+A, Ctrl+C)
+3. Mở pgAdmin Query Tool (như Cách 2)
+4. Paste vào (Ctrl+V)
+5. Execute (F5)
 
 #### 1.4. Kiểm tra Database
 
+**Cách 1: Kiểm tra trong pgAdmin**
+1. Refresh database (click chuột phải → Refresh)
+2. Mở `Schemas` → `public` → `Tables`
+3. Kiểm tra có 6 bảng:
+   - ✅ customer
+   - ✅ order
+   - ✅ order_detail
+   - ✅ product
+   - ✅ product_variant
+   - ✅ user
+
+**Cách 2: Kiểm tra bằng Command Line**
 ```powershell
 # Kết nối vào database
 & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d shoe_store_management
 
-# Kiểm tra các bảng
+# Sau khi kết nối, chạy các lệnh sau:
+```
+```sql
+-- Liệt kê tất cả bảng
 \dt
 
-# Output mong đợi:
-#              List of relations
-#  Schema |      Name        | Type  |  Owner
-# --------+------------------+-------+----------
-#  public | customer         | table | postgres
-#  public | order            | table | postgres
-#  public | order_detail     | table | postgres
-#  public | product          | table | postgres
-#  public | product_variant  | table | postgres
-#  public | user             | table | postgres
+-- Output mong đợi:
+              List of relations
+ Schema |      Name        | Type  |  Owner
+--------+------------------+-------+----------
+ public | customer         | table | postgres
+ public | order            | table | postgres
+ public | order_detail     | table | postgres
+ public | product          | table | postgres
+ public | product_variant  | table | postgres
+ public | user             | table | postgres
+(6 rows)
 
-# Kiểm tra dữ liệu
+-- Kiểm tra tài khoản Admin/Staff
 SELECT * FROM "user";
-# Output: 2 rows (admin, staff1)
+-- Output mong đợi: 2 rows (admin, staff1)
 
-SELECT * FROM product;
-# Output: 3 rows (Runner X, Da Classic, Thể Thao Flex)
+-- Kiểm tra khách hàng
+SELECT customer_id, name, phone_number, username FROM customer;
+-- Output mong đợi: 3 rows
 
-# Thoát
+-- Kiểm tra sản phẩm
+SELECT product_id, name, base_price FROM product;
+-- Output mong đợi: 3 rows (Runner X, Da Classic, Thể Thao Flex)
+
+-- Kiểm tra biến thể sản phẩm (SKU)
+SELECT sku_code, size, color, quantity_in_stock, price 
+FROM product_variant;
+-- Output mong đợi: 7 rows
+
+-- Thoát khỏi psql
 \q
 ```
 
@@ -826,10 +868,19 @@ Get-Service postgresql*
 
 2. Database tồn tại:
 ```powershell
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -l | Select-String "shoe_store"
+# Hoặc:
 psql -U postgres -l | findstr shoe_store
 ```
 
-3. Password đúng trong `application.properties`
+3. Password đúng trong `api/src/main/resources/application.properties`
+
+4. **Nếu database chưa tồn tại hoặc chưa có dữ liệu:**
+```powershell
+# Tạo và setup lại database
+createdb -U postgres shoe_store_management
+psql -U postgres -d shoe_store_management -f sql/setup_database.sql
+```
 
 ---
 

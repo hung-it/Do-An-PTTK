@@ -191,8 +191,7 @@ PTTK_Backup_Desktop/
 │           └── api.js               # Axios HTTP client
 │
 ├── 📂 sql/
-│   ├── init_schema.sql              # Database schema
-│   └── add_missing_columns.sql      # Migration
+│   └── setup_database.sql           # Database setup (tất cả trong 1 file)
 │
 ├── 📂 lib/                          # External JARs
 │   └── postgresql-42.7.8.jar
@@ -220,16 +219,82 @@ PTTK_Backup_Desktop/
 
 #### 1️⃣ Cài đặt Database
 
+**Bước 1: Khởi động PostgreSQL Service**
+
 ```bash
-# Tạo database
-createdb -U postgres shoe_store_management
+# Windows (PowerShell)
+Get-Service postgresql* | Start-Service
 
-# Import schema
-psql -U postgres -d shoe_store_management -f sql/init_schema.sql
-
-# Thêm các columns cho online ordering
-psql -U postgres -d shoe_store_management -f sql/add_missing_columns.sql
+# Mac/Linux
+sudo systemctl start postgresql
+# hoặc
+brew services start postgresql
 ```
+
+**Bước 2: Tạo Database**
+
+```bash
+# Tạo database mới (sẽ hỏi password PostgreSQL)
+createdb -U postgres shoe_store_management
+```
+
+**Bước 3: Import Schema và Dữ liệu**
+
+```bash
+# CÁCH 1: Sử dụng psql command (Khuyên dùng)
+# Windows PowerShell:
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d shoe_store_management -f sql/setup_database.sql
+
+# Mac/Linux Terminal:
+psql -U postgres -d shoe_store_management -f sql/setup_database.sql
+
+# CÁCH 2: Sử dụng pgAdmin (GUI)
+# 1. Mở pgAdmin
+# 2. Kết nối đến server PostgreSQL
+# 3. Click chuột phải vào database "shoe_store_management"
+# 4. Chọn "Query Tool"
+# 5. Mở file sql/setup_database.sql (File > Open)
+# 6. Click nút Execute (F5)
+```
+
+**Kết quả mong đợi:**
+
+Sau khi chạy thành công, bạn sẽ thấy:
+```
+✓ DATABASE SETUP COMPLETED!
+✓ Tables Created: 6
+✓ Users: 2
+✓ Customers: 3
+✓ Products: 3
+✓ Product Variants: 7
+✓ Orders: 0
+✓ Order Details: 0
+
+============================================
+THÔNG TIN TÀI KHOẢN DEMO:
+============================================
+ADMIN/STAFF ACCOUNTS:
+user_id | username | role
+---------|----------|-------
+1        | admin    | Admin
+2        | staff1   | Staff
+
+CUSTOMER ACCOUNTS:
+customer_id | name              | phone_number | username
+------------|-------------------|--------------|----------
+1           | Nguyen Viet Hung  | 0123456789   | hung
+2           | Nguyen Tuan An    | 0987654321   | tuanan
+3           | Nguyen Gia Hung   | 0111111111   | giahung
+
+[...và thông tin sản phẩm...]
+
+✓ SETUP HOÀN TẤT!
+```
+
+**Lưu ý:**
+- File `setup_database.sql` **an toàn khi chạy lại nhiều lần** (sử dụng `IF NOT EXISTS`)
+- Nếu database đã có dữ liệu, script sẽ không tạo duplicate
+- Để reset hoàn toàn database, xóa và tạo lại: `dropdb shoe_store_management && createdb shoe_store_management`
 
 #### 2️⃣ Cấu hình Database Password
 
@@ -286,7 +351,7 @@ Web app chạy tại: **http://localhost:3000**
 ### Desktop App - Chức năng bán hàng
 
 #### TC1: Tìm kiếm sản phẩm
-1. Đăng nhập với `staff1` / `456`
+1. Đăng nhập với `staff1` / `123`
 2. Click tab "Bán Hàng"
 3. Nhập "Runner" vào ô tìm kiếm
 4. Click "Tìm kiếm"

@@ -1,6 +1,5 @@
 com\pttk\api\ApiApplication.class
 com\pttk\api\dto\RegisterRequest.class
-application.properties
 com\pttk\api\controller\AuthController.class
 com\pttk\api\controller\ProductController.class
 com\pttk\api\controller\OrderController.class
