@@ -23,13 +23,13 @@ public class ProductController {
         List<Map<String, Object>> products = new ArrayList<>();
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
-            String sql = "SELECT p.product_id, p.name, p.description, p.base_price, " +
+            String sql = "SELECT p.product_id, p.name, p.description, p.base_price, p.image_url, " +
                         "COUNT(pv.variant_id) as variant_count, " +
                         "MIN(pv.price) as min_price, " +
                         "MAX(pv.price) as max_price " +
                         "FROM product p " +
                         "LEFT JOIN product_variant pv ON p.product_id = pv.product_id " +
-                        "GROUP BY p.product_id, p.name, p.description, p.base_price " +
+                        "GROUP BY p.product_id, p.name, p.description, p.base_price, p.image_url " +
                         "ORDER BY p.product_id";
             
             try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -41,6 +41,7 @@ public class ProductController {
                     product.put("name", rs.getString("name"));
                     product.put("description", rs.getString("description"));
                     product.put("base_price", rs.getBigDecimal("base_price"));
+                    product.put("image_url", rs.getString("image_url")); // Thêm image_url
                     product.put("variant_count", rs.getInt("variant_count"));
                     product.put("min_price", rs.getBigDecimal("min_price"));
                     product.put("max_price", rs.getBigDecimal("max_price"));
@@ -74,6 +75,7 @@ public class ProductController {
                     product.put("name", rs.getString("name"));
                     product.put("description", rs.getString("description"));
                     product.put("base_price", rs.getBigDecimal("base_price"));
+                    product.put("image_url", rs.getString("image_url")); // Thêm image_url
                     
                     return ResponseEntity.ok(ApiResponse.success("Lấy thông tin sản phẩm thành công", product));
                 } else {
@@ -136,7 +138,7 @@ public class ProductController {
         List<Map<String, Object>> products = new ArrayList<>();
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
-            String sql = "SELECT p.product_id, p.name, p.description, p.base_price, " +
+            String sql = "SELECT p.product_id, p.name, p.description, p.base_price, p.image_url, " +
                         "COUNT(pv.variant_id) as variant_count " +
                         "FROM product p " +
                         "LEFT JOIN product_variant pv ON p.product_id = pv.product_id " +
@@ -154,6 +156,7 @@ public class ProductController {
                     product.put("name", rs.getString("name"));
                     product.put("description", rs.getString("description"));
                     product.put("base_price", rs.getBigDecimal("base_price"));
+                    product.put("image_url", rs.getString("image_url")); // Thêm image_url
                     product.put("variant_count", rs.getInt("variant_count"));
                     products.add(product);
                 }

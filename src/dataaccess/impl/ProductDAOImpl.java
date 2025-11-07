@@ -57,11 +57,12 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Integer save(Product entity, Connection conn) throws SQLException {
-        String sql = "INSERT INTO product (name, description, base_price) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO product (name, description, base_price, image_url) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, entity.getName());
             ps.setString(2, entity.getDescription());
             ps.setBigDecimal(3, entity.getBasePrice()); // Sử dụng setBigDecimal
+            ps.setString(4, entity.getImageUrl()); // Thêm image_url
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -74,12 +75,13 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public boolean update(Product entity, Connection conn) throws SQLException {
-        String sql = "UPDATE product SET name = ?, description = ?, base_price = ? WHERE product_id = ?";
+        String sql = "UPDATE product SET name = ?, description = ?, base_price = ?, image_url = ? WHERE product_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, entity.getName());
             ps.setString(2, entity.getDescription());
             ps.setBigDecimal(3, entity.getBasePrice()); // Sử dụng setBigDecimal
-            ps.setInt(4, entity.getProductId());
+            ps.setString(4, entity.getImageUrl()); // Thêm image_url
+            ps.setInt(5, entity.getProductId());
             return ps.executeUpdate() > 0;
         }
     }
@@ -95,11 +97,13 @@ public class ProductDAOImpl implements ProductDAO {
 
     // Hàm tiện ích: Ánh xạ dữ liệu từ ResultSet sang đối tượng Product
     private Product mapResultSetToProduct(ResultSet rs) throws SQLException {
-        return new Product(
+        Product product = new Product(
             rs.getInt("product_id"),
             rs.getString("name"),
             rs.getString("description"),
             rs.getBigDecimal("base_price") // Sử dụng getBigDecimal
         );
+        product.setImageUrl(rs.getString("image_url")); // Thêm image_url
+        return product;
     }
 }

@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS product (
     product_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    base_price NUMERIC(10, 2) NOT NULL -- Giá cơ bản
+    base_price NUMERIC(10, 2) NOT NULL, -- Giá cơ bản
+    image_url VARCHAR(500) -- URL hoặc đường dẫn hình ảnh sản phẩm
 );
 
 -- Bảng 3: PRODUCT_VARIANT (Đơn vị Tồn kho - SKU)
@@ -98,6 +99,7 @@ COMMENT ON COLUMN "order".shipping_address IS 'Địa chỉ giao hàng cụ th�
 COMMENT ON COLUMN "order".payment_method IS 'Phương thức: COD, Banking, Momo, ZaloPay';
 COMMENT ON COLUMN customer.address IS 'Địa chỉ giao hàng mặc định';
 COMMENT ON COLUMN customer.join_date IS 'Ngày khách hàng tham gia hệ thống';
+COMMENT ON COLUMN product.image_url IS 'URL hoặc đường dẫn đến hình ảnh sản phẩm';
 
 -- ============================================
 -- PHẦN 3: DỮ LIỆU MẪU (DEMO DATA)
@@ -129,16 +131,16 @@ SELECT 'Nguyen Gia Hung', '0111111111', 'giahung', '123', 'Số 54 Triều Khúc
 WHERE NOT EXISTS (SELECT 1 FROM customer WHERE phone_number = '0111111111');
 
 -- Thêm Sản phẩm mẫu (chỉ thêm nếu chưa có)
-INSERT INTO product (product_id, name, description, base_price)
-SELECT 1, 'Giày Runner X', 'Giày chạy bộ siêu nhẹ', 1500000.00
+INSERT INTO product (product_id, name, description, base_price, image_url)
+SELECT 1, 'Giày Runner X', 'Giày chạy bộ siêu nhẹ', 1500000.00, '/images/products/giay-runner-x.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM product WHERE product_id = 1);
 
-INSERT INTO product (product_id, name, description, base_price)
-SELECT 2, 'Giày Da Classic', 'Giày da công sở cao cấp', 2200000.00
+INSERT INTO product (product_id, name, description, base_price, image_url)
+SELECT 2, 'Giày Da Classic', 'Giày da công sở cao cấp', 2200000.00, '/images/products/giay-da-classic.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM product WHERE product_id = 2);
 
-INSERT INTO product (product_id, name, description, base_price)
-SELECT 3, 'Giày Thể Thao Flex', 'Giày thể thao đa năng', 1800000.00
+INSERT INTO product (product_id, name, description, base_price, image_url)
+SELECT 3, 'Giày Thể Thao Flex', 'Giày thể thao đa năng', 1800000.00, '/images/products/giay-the-thao-flex.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM product WHERE product_id = 3);
 
 -- Cập nhật sequence để tránh xung đột ID
@@ -228,16 +230,3 @@ SELECT
 FROM product_variant pv
 JOIN product p ON pv.product_id = p.product_id
 ORDER BY pv.variant_id;
-
--- ============================================
--- HOÀN TẤT!
--- ============================================
-\echo ''
-\echo '============================================'
-\echo '✓ SETUP HOÀN TẤT!'
-\echo '============================================'
-\echo 'Bây giờ bạn có thể:'
-\echo '1. Chạy Desktop App: .\build.bat && .\run.bat'
-\echo '2. Chạy API: cd api && mvn spring-boot:run'
-\echo '3. Chạy Web App: cd customer-web && npm start'
-\echo '============================================'

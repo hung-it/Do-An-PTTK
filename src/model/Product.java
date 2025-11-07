@@ -7,6 +7,7 @@ public class Product {
     private String name;
     private String description;
     private BigDecimal basePrice; // Sử dụng BigDecimal cho giá tiền
+    private String imageUrl; // URL hoặc đường dẫn hình ảnh
     
     public Product() {}
 
@@ -15,6 +16,14 @@ public class Product {
         this.name = name;
         this.description = description;
         this.basePrice = basePrice;
+    }
+    
+    public Product(int productId, String name, String description, BigDecimal basePrice, String imageUrl) {
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.basePrice = basePrice;
+        this.imageUrl = imageUrl;
     }
 
     // --- Getters ---
@@ -30,6 +39,9 @@ public class Product {
     public BigDecimal getBasePrice() {
         return basePrice;
     }
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
     // --- Setters ---
     public void setProductId(int productId) {
@@ -43,5 +55,8 @@ public class Product {
     }
     public void setBasePrice(BigDecimal basePrice) {
         this.basePrice = basePrice; 
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
